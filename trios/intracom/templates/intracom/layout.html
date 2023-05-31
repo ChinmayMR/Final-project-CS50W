@@ -1,0 +1,125 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}Trios Intracom{% endblock %}</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link href="{% static 'intracom/styles.css' %}" rel="stylesheet">
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
+        <script src="https://kit.fontawesome.com/726b1a2df6.js" crossorigin="anonymous"></script>
+        {% block head %}{% endblock %}
+        <link rel="icon" type="image/x-icon" href="https://www.thetrioshotel.com/wp-content/uploads/2022/07/favicon.png">
+    </head>
+    <body>
+        <script>
+            if(window.matchMedia("(pointer: coarse)").matches) {
+                // touchscreen
+
+            }
+
+            function is_touch_enabled() {
+                return ( 'ontouchstart' in window ) ||
+                    ( navigator.maxTouchPoints > 0 ) ||
+                    ( navigator.msMaxTouchPoints > 0 );
+            }
+
+            
+            function openNav() {
+              document.getElementById("mySidenav").style.width = "250px";
+              document.getElementById("mySidenavclosed").style.width = "0px";
+            }
+            
+            function closeNav() {
+              document.getElementById("mySidenav").style.width = "0";
+              document.getElementById("mySidenavclosed").style.width = "75px";
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                if(is_touch_enabled() === true) {
+                    // touchscreen
+                    // document.getElementById("mySidenavclosed").remove()
+                    // document.querySelector('.body').style.marginLeft = "256px";
+                    // openNav()
+                    document.getElementById("mySidenavclosed").style.width = "250px";
+                    document.getElementById("mySidenav").onmouseover = function() {openNav()};
+                    document.getElementById("mySidenav").onmouseout = function() {closeNav()};
+                    document.getElementById("mySidenavclosed").style.width = "75px";
+                    // document.querySelector('.opennavbar_touch').display = "block";
+                } else {
+                    document.getElementById("mySidenavclosed").style.width = "250px";
+                    document.getElementById("mySidenav").onmouseover = function() {openNav()};
+                    document.getElementById("mySidenav").onmouseout = function() {closeNav()};
+                    document.getElementById("mySidenavclosed").style.width = "75px";
+                }
+            })
+
+
+            function gold(id) {
+                document.querySelector(`#${id}`).style.color = "#B69950";
+            }
+
+            function ungold(id) {
+                document.querySelector(`#${id}`).style.color = "#FFFFFF";
+            }
+
+            {% block script %} 
+            {% endblock %}
+        </script>
+        <!-- onmouseover="openNav()" onmouseout="closeNav()" -->
+        <div id="mySidenav" class="sidenav" style="z-index: 2000;">
+            <a href="{% url 'index' %}" onmouseover="gold('item3'), openNav()" onmouseout="ungold('item3'), openNav()"> <i class="fa-solid fa-bullhorn" style="color: #ffffff;" id="item3"></i>   Alerts</a>
+            <a href="{% url 'checklists' %}" onmouseover="gold('item1'), openNav()" onmouseout="ungold('item1'), openNav()"> <i class="fa-solid fa-check" style="color: #ffffff;" id="item1"></i>  Checklists</a>
+            <a href="{% url 'appointment' %}" onmouseover="gold('item2'), openNav()" onmouseout="ungold('item2'), openNav()"> <i class="fa-sharp fa-regular fa-calendar-days" style="color: #ffffff;" id="item2"></i>    Appointment</a>
+            <a href="{% url 'leave' %}" onmouseover="gold('item4'), openNav()" onmouseout="ungold('item4'), openNav()"> <i class="fa-brands fa-wpforms" id="item4" ></i>   Leave </a>
+            {% if request.user.manager %}
+                <a id="edit" href="{% url 'edit' %}" class="edit_users_class" onmouseover="gold('item5'), openNav()" onmouseout="ungold('item5'), openNav()"><i class='fas fa-edit' id="item5" style='color:#ffffff;'></i> Edit users</a>
+            {% endif %}
+            <a href="#" id="edit" class="opennavbar_touch" onclick="closeNav()"><ion-icon name="close-circle-outline"></ion-icon></i></a>
+                <a class="edit" id="logout" href="{% url 'logout' %}" onmouseover="gold('item6'), openNav()" onmouseout="ungold('item6'), openNav()">
+                    <i class="fa-solid fa-right-from-bracket" id="item6" style='color:#ffffff;'></i>
+                    <span>Logout</span>
+                </a>
+        </div>
+
+        <div id="mySidenavclosed" class="sidenavclosed" onmouseover="openNav()">
+            
+            <a href="#" id="edit" class="opennavbar_touch" onclick="openNav()"><ion-icon name="menu-outline"></ion-icon></i></a>
+            <a href="#"> <i class="fa-solid fa-bullhorn" style="color: #ffffff;" id="item3"></i></a>
+            <a href="#"> <i class="fa-solid fa-check" style="color: #ffffff;" id="item1"></i> </a>
+            <a href="#"> <i class="fa-sharp fa-regular fa-calendar-days" style="color: #ffffff;" id="item2"></i></a>
+            <a href="#"> <i class="fa-brands fa-wpforms" style="color: #ffffff;" id="item4" ></i></a>
+        </div>
+
+        <div class="body">
+            {% if message_success %} 
+                <div class="alert success">
+                    <input type="checkbox" id="alert2"/>
+                    <label class="close" title="close" for="alert2">
+                <i class="icon-remove"></i>
+                </label>
+                    <p class="inner">
+                        {{ message_success }}
+                    </p>
+                </div>
+            {% elif message_danger %} 
+                <div class="alert error">
+                    <input type="checkbox" id="alert1"/>
+                <label class="close" title="close" for="alert1">
+                <i class="icon-remove"></i>
+                </label>
+                    <p class="inner">
+                        {{ message_danger }}
+                    </p>
+                </div>
+            {% endif %}
+            
+            {% block body %}
+            {% endblock %}
+        </div>
+   
+    </body>
+</html>

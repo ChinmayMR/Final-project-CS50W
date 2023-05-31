@@ -1,0 +1,163 @@
+{% extends "intracom/layout.html" %}
+{% load static %}
+
+{% block title %}
+    Trios Intracom: Appointment
+{% endblock title %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static "intracom/leave.css" %}">
+    <script src="{% static "intracom/leave.js" %}"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://unpkg.com/open-props@1.5.8/open-props.min.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+{% endblock head %}
+
+{% block body %} 
+    <!-- Adding new application -->
+    <div class="form-overlay">
+    </div>
+    <div class="icon fa fa-add" id="form-container">
+        <span class="icon fa fa-close" id="form-close">
+        </span>
+        <div id="form-content">
+            <form action="" method="post">
+                {% csrf_token %}
+                <select class="input select" name="leave_type" required>
+                    {% for leave_type in leave_types %}
+                        <option>{{ leave_type }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <textarea class="input message" name="reason" placeholder="Reason" required></textarea>
+                <input class="input" id="start_date" step="1" name="start_date" required min="{{ datetime|date:"Y-m-d" }}T{{ datetime|date:"H:i:s" }}" type="datetime-local">
+                </input>
+                <input class="input" id="end_date" step="1" name="end_date" required min="{{ datetime|date:"Y-m-d" }}T{{ datetime|date:"H:i:s" }}" type="datetime-local">
+                </input>
+                <input class="input submit" type="submit" value="Send application" required></input>
+            </form>
+        </div>
+    </div> 
+     <!-- Cards  -->
+     <div class="container">
+        <div class="card-deck">
+            {% for leave in leavs %}
+                <div class="card">
+                      {% if leave.approved == "Waiting" and request.user.manager and request.user != leave.name %}
+                          <a data-toggle="modal" data-target="#accept_modal{{ leave.id }}" class="card__share card__hovered" title="Accept" aria-label="Delete checklist">
+                              <ion-icon style="color:#fff;" name="checkmark-outline"></ion-icon>
+                          </a>
+                          
+                          <a data-toggle="modal" data-target="#decline_modal{{ leave.id }}" class="card__share card__hovered" style="margin-right: 60px;" title="Decline" aria-label="Delete checklist">
+                              <ion-icon style="color:#fff;" name="close-outline"></ion-icon>
+                          </a>
+                      {% endif %}
+                    <div class="card__body | flow">
+                      <h3 class="card__title">{{ leave.leave_type }} leave</h3>
+                      <div class="card__tags">
+                              <span class="card__tag" href="#">{{ leave.approved }}</span>
+                      </div>
+                      <p class="card__date">
+                        {{ leave.name }} is requesting a leave.
+                        <br>
+                        From:
+                        <time>{{ leave.frm }}</time>
+                        <br>
+                        To:
+                        <time>{{ leave.to }}</time>
+                      </p>
+                      <button type="button" class="card__cta" style="background-color: transparent; border: none;" href="#" class="btn btn-sm view_btn" data-toggle="modal" data-target="#exampleModalLong{{ leave.id }}">
+                        View details
+                      </button>
+                    </div>
+                </div>
+                <div class="modal fade" id="exampleModalLong{{ leave.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header" style="padding-bottom: 5px;" >
+                          <h5 class="modal-title">{{ leave.leave_type }} leave
+                          </h5>
+                          <h5 class="badger"><span class="badge badge-secondary" style="margin-left: 3px; margin-top: 5px; background-color: #004946;" id="badge_{{ alert.id }}">{{ leave.approved }}</span></h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close_btn">
+                              <span aria-hidden="true"><ion-icon id="close_btn_icon" class="close" name="close-circle-outline"></ion-icon></span>
+                          </button>
+                      </div>
+                      {% if leave.approve_msg %}
+                        <div class="modal-body" style="border-bottom: 1px solid #dee2e6;">
+                            {{ leave.name }} is requesting a leave.
+                            From: <time>{{ leave.frm }}</time>
+                            <br>
+                            To: <time>{{ leave.to }}</time>
+                            <br>
+                            Reason: {{ leave.reason }}
+                        </div>
+                        <div class="modal-body">
+                              {{ leave.approve_msg }}
+                        </div>
+                    {% else %}
+                          <div class="modal-body">
+                            {{ leave.name }} is requesting a leave.
+                            From: <time>{{ leave.frm }}</time>
+                            <br>
+                            To: <time>{{ leave.to }}</time>
+                            <br>
+                            Reason: {{ leave.reason }}
+                        </div>
+                      {% endif %}
+                  </div>
+                  </div>
+                </div>
+                <!-- Modal -->
+                <div class="modal fade" id="accept_modal{{ leave.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                  <div class="modal-dialog" role="document" style="border: 3px #28a745 solid; border-radius: 0.3rem;">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLongTitle">Accept</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                      </div>
+                      <form action="{% url 'accLeave' leave.id %}" method="post">
+                          {% csrf_token %}
+                          <div class="modal-body">
+                              <textarea name="message" cols="40" rows="3" class="form-control" placeholder="Message" id="exampleFormControlTextarea1" required></textarea>
+                          </div>
+                          <div class="modal-footer">
+                              <input type="submit" value="Accept" class="btn btn-success">
+                              </input>
+                          </div>
+                      </form>
+                  </div>
+                  </div>
+              </div>
+              <div class="modal fade" id="decline_modal{{ leave.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                  <div class="modal-dialog" style="border: 3px #dc3545 solid;  border-radius: 0.3rem;" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLongTitle">Decline</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                      </div>
+                      <form action="{% url 'decLeave' leave.id %}" method="post">
+                          {% csrf_token %}
+                          <div class="modal-body">
+                              <textarea name="message" cols="40" rows="3" class="form-control" placeholder="Message" id="exampleFormControlTextarea1" required></textarea>
+                          </div>
+                          <div class="modal-footer">
+                              <input type="submit" value="Decline" class="btn btn-danger">
+                              </input>
+                          </div>
+                      </form>
+                  </div>
+                  </div>
+              </div>
+              
+          {% empty %}
+            <h1 style="color: black;">No previous leave applications found</h1>
+          {% endfor %}
+        </div>
+    </div>
+{% endblock body %}

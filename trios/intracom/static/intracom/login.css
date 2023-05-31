@@ -1,0 +1,98 @@
+body {
+    background-color: #004946;
+}
+
+.back {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    color: white;
+
+  }
+  
+  .div-center {
+    width: 400px;
+    height: 400px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    max-width: 100%;
+    max-height: 100%;
+    overflow: auto;
+    padding: 1em 2em;
+    display: table;
+  }
+  
+  div.content {
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+  #center {
+
+  }
+
+.inputs, input:hover{
+    border: 2px solid #B69950 !important;
+    box-shadow: none !important;
+    /* border: none; */
+    background-color: transparent;
+    background: transparent;
+    text-decoration: none;
+}
+
+#submit_bt {
+    background-color: #B69950;
+    /* margin-left: 30px; */
+    padding-left: 150px;
+    padding-right: 150px;
+    border: 1px solid #B69950 !important;
+}
+
+#reg {
+    display: block;
+    margin-top: 10px;
+    /* color: #B69950; */
+}
+
+#username, #exampleInputPassword1{
+    padding-left: 35px;
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAACXBIWXMAAAsTAAALEwEAmpwYAAABP0lEQVR4AdVTQU7DMBAc26hcwwuAF8APaK9FgOEDwKnk1P4g8IP2FCEhNX0BRqjlCPwAXkCfUG4UFJvxAQnaOCiIQztSpM3aM+udtYFFhyhbvEv1hlPow2Gbv5EQyN5yXBzGZhziyFIxiXuX43Fawya/NefwvMrcNddCvJXQAhQSig12Y3P+LdsdpjqqCXQYd1DlhNa3aWEKChm2fhDiBQVJmliJaK5QzpzDuLKg906x7dm8kmjTy0GIVzrlUaozltwCvXQ8sVA4pg1onpnGnwQ9OIQTKbDj4w+Bm/2WMVhqzLU8utSa2TYnWS8j0tMnetvjPc2Cgt4vIZHkFqd7sXkoE7xNdZ0T7zPsNVum+5X/cW282NSi8ZuYh9/jCzNMCjf4t8t2X1ARnjO8OlovPOF/YFZwgopw5Lwr+4qlwSf3o20+RN7NBQAAAABJRU5ErkJggg==") no-repeat left;
+    background-position: 7px 10px;
+    background-size: 20px;
+    color: #B69950;
+  }
+  .pass_icon{
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAWCAYAAADAQbwGAAAACXBIWXMAAAsTAAALEwEAmpwYAAABLUlEQVR4AeVUQU6EQBCsmZBw3SfgC/QHrleNsfkBngy/WJ/gRcxe1n3BDjHCEfwJP5Cb0biMPSEQ1jBmRzExsRIgM5UueqarG5gY4itys6KZ/4JIeDjUGjPdID2L1f23BPOEAi1RQKNisfVWovYaECSOXxuchLGqxuI8m6AR44zWnNFisK0eE1r45kfAAfYFB0XZHRU2PltSkd0SjXFyNELgiJ8UNrwj5Xu92FtQtAWoYYEWdk5iYkwu2Nvmk+fmzFRMVmNBGgj4FQiBstniaejNXjBf0qozL1wykm1xTq9UaL69D1ks4k0BR/DJlP+G52794zsML9VOxf9+lf+5YL3hGQhH5G1MX+nhPLw2c44NXsIBpqu4GW669Y6RHxKaS9NWDmi4Pc9jVeK38AE8cGuu1MeRgwAAAABJRU5ErkJggg==") no-repeat left !important;
+    background-position: 7px 7px !important;
+    /* background-size: 20px; */
+    /* color: #B69950; */
+    /* padding-left: 35px; */
+  }
+
+::placeholder {
+color: #B69950;
+}
+
+a{
+    text-decoration: none;
+    color: #B69950;
+}
+
+a:hover {
+    text-decoration: none;
+    color: #836D37;
+}
+
+#icon {
+    height: 200px;
+}
+
+#icondiv {
+    padding-top: 20px;
+    text-align: center;
+}

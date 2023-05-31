@@ -1,0 +1,203 @@
+{% extends "intracom/layout.html" %}
+{% load static %}
+
+{% block title %}
+    Trios Intracom: Leave 
+{% endblock title %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static "intracom/appointment.css" %}">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="{% static "intracom/appointment.js" %}"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+{% endblock head %}
+
+{% block body %}
+  
+<div class="form-overlay">
+</div>
+<div class="icon fa fa-add" id="form-container">
+    <span class="icon fa fa-close" id="form-close">
+    </span>
+    <div id="form-content">
+        <form action="{% url 'appointment' %}" method="post" style="overflow: scroll;">
+            {% csrf_token %}
+            <select class="input select" name="To" required>
+                {% for user in users %}
+                    {% if request.user.username == user.username %}
+                    {% else %}
+                        <option>{{ user.username }}
+                        </option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <input class="input" name="subject" placeholder="Subject" type="text" required>
+            </input>
+            <textarea class="input message" name="description" placeholder="More details" required></textarea>
+            <input class="input" id="start_date"  step="1" name="start_date" required min="{{ datetime|date:"Y-m-d" }}T{{ datetime|date:"H:i:s" }}" type="datetime-local">
+            </input>
+            <input class="input" id="end_date"  step="1" name="end_date" required min="{{ datetime|date:"Y-m-d" }}T{{ datetime|date:"H:i:s" }}" type="datetime-local">
+            </input>
+            <input class="input submit" type="submit" value="Request appointment" required></input>
+        </form>
+    </div>
+</div>  
+
+<div class="modal fade" tabindex="-1" role="dialog" id="new_post" aria-labelledby="new_post" aria-hidden="hidden">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalScrollableTitle">New alert</h5>
+            </div>
+            <form action="" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <label for="inlineFormInputName2">Title</label>
+                    <input type="text" name="title" id="title" class="form-control mb-2 mr-sm-2" id="inlineFormInputName2" required>
+                    <br>
+                    <label for="exampleFormControlTextarea1">Description</label>
+                    <textarea name="description" cols="40" rows="3" class="form-control" id="exampleFormControlTextarea1" required></textarea>
+                    <br>
+                    <label for="url">Image URL</label>
+                    <br>
+                    <input type="url" name="img_url" id="url" placeholder="https://example.com/image.png" pattern="https://.*" size="30" required>
+                    <br>
+                    <br>
+                    <label for="department">Department:</label>
+                    <select id="department" name="department">
+                        {% for department in departments %}
+                            {% if department == "All" %}
+                            {% else %}
+                                <option value="{{ department }}">{{ department }}</option>
+                            {% endif %}
+                        {% endfor %}
+
+                    </select>
+                    <br>
+                    <br>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <input type="submit" class="btn btn-success" value="Save alert">
+                </div>
+            </form>
+        </div>
+    </div>
+  </div>
+  <!-- Cards -->
+  <div class="container">
+      <div class="card-deck">
+          {% for appointment in appointments %}
+              <div class="card">
+                
+                    {% if request.user == appointment.requested_user and appointment.completed == "Waiting" %}
+                        <a data-toggle="modal" data-target="#accept_modal{{ appointment.id }}" class="card__share card__hovered" href="{% url 'delAlert' appointment.id %}" title="Delete" aria-label="Delete checklist">
+                            <ion-icon name="checkmark-outline"></ion-icon>
+                        </a>
+                        
+                        <a data-toggle="modal" data-target="#decline_modal{{ appointment.id }}" class="card__share card__hovered" style="margin-right: 60px;" href="{% url 'delAlert' appointment.id %}" title="Delete" aria-label="Delete checklist">
+                            <ion-icon name="close-outline"></ion-icon>
+                        </a>
+                    {% endif %}
+                  <div class="card__body | flow">
+                    <h3 class="card__title">{{ appointment.subject|truncatechars:17 }}</h3>
+                    <div class="card__tags">
+                            <span class="card__tag" href="#">{{ appointment.completed }}</span>
+                    </div>
+                    <p class="card__date">
+                      Meeting with {{ appointment.requested_user }} from
+                      <time>{{ appointment.frm }}</time>
+                      to
+                      <time>{{ appointment.to }}</time>
+                    </p>
+                    <button type="button" class="card__cta" style="background-color: transparent; border: none;" href="#" class="btn btn-sm view_btn" data-toggle="modal" data-target="#exampleModalLong{{ appointment.id }}">
+                      View details
+                    </button>
+                  </div>
+              </div>
+              <div class="modal fade" id="exampleModalLong{{ appointment.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="padding-bottom: 5px;" >
+                        <h5 class="modal-title">{{ appointment.subject }}
+                        </h5>
+                        <h5 class="badger"><span class="badge badge-secondary" style="margin-left: 3px; margin-top: 5px; background-color: #004946;" id="badge_{{ alert.id }}">{{ appointment.completed }}</span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close_btn">
+                            <span aria-hidden="true"><ion-icon id="close_btn_icon" class="close" name="close-circle-outline"></ion-icon></span>
+                        </button>
+                    </div>
+                    <div class="modal-body" style="border-bottom: 1px solid #dee2e6;">
+                        From: <time>{{ appointment.frm }}</time>
+                        <br>
+                        To: <time>{{ appointment.to }}</time>
+                        <br>
+                        Meeting with {{ appointment.requested_user }} and {{ appointment.request_user }}
+                    </div>
+                    {% if appointment.complete_msg %}
+                        <div class="modal-body" style="border-bottom: 1px solid #dee2e6;">
+                            {{ appointment.complete_msg }}
+                        </div>
+                    {% endif %}
+                    <div class="modal-body">
+                        {{ appointment.description }}
+                    </div>
+    
+                </div>
+                </div>
+              </div>
+              <!-- Modal -->
+              <div class="modal fade" id="accept_modal{{ appointment.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                <div class="modal-dialog" role="document" style="border: 3px #28a745 solid; border-radius: 0.3rem;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Accept</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <form action="{% url 'accApt' appointment.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <textarea name="message" cols="40" rows="3" class="form-control" placeholder="Message" id="exampleFormControlTextarea1" required></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="submit" value="Accept" class="btn btn-success">
+                            </input>
+                        </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+            <div class="modal fade" id="decline_modal{{ appointment.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                <div class="modal-dialog" style="border: 3px #dc3545 solid;  border-radius: 0.3rem;" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Decline</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <form action="{% url 'decApt' appointment.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <textarea name="message" cols="40" rows="3" class="form-control"placeholder="Message" id="exampleFormControlTextarea1" required></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="submit" value="Decline" class="btn btn-danger">
+                            </input>
+                        </div>
+                    </form>
+                </div>
+                </div>
+            </div>
+            
+        {% empty %}
+          <h1 style="color: black;">No appointments found</h1>
+        {% endfor %}
+      </div>
+  </div>
+{% endblock body %}

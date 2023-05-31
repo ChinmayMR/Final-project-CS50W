@@ -1,0 +1,156 @@
+{% extends "intracom/layout.html" %}
+{% load static %}
+
+{% block title %} Trios Intracom: Checklists {% endblock %}
+
+{% block head %} 
+    <link href="{% static 'intracom/checklists.css' %}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.css" rel="stylesheet"/>
+    <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="{% static 'intracom/checklists.js ' %}"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Rubik:ital@0;1&display=swap" rel="stylesheet">
+{% endblock %}
+{% block body %}
+
+    <button class="button" id="add_butt" onclick="show_filter()" style="margin-bottom: 60px;"><ion-icon id='filter-outline' name="filter-outline"></ion-icon></button>
+
+    {% if request.user.manager %}
+        <a href="" class="edit_button" data-target="#new_post" data-toggle="modal">
+            <button class="button" id="add_butt"><ion-icon id='margin-bottom: 20px; margin-right: 45px;' name="add"></ion-icon></button>
+        </a>
+    {% endif %}
+
+
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="new_post" aria-labelledby="new_post" aria-hidden="hidden">
+            <div class="modal-dialog modal-dialog-scrollable" role="document">
+                <div class="modal-content" style="overflow: auto;">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalScrollableTitle">New checklist</h5>
+                    </div>
+                    <form action="{% url 'newChecklist' %}" method="post" style="overflow: scroll;">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <label for="inlineFormInputName2">Title</label>
+                            <input type="text" name="title" id="title" class="form-control mb-2 mr-sm-2" id="inlineFormInputName2" required>
+                            <br>
+                            <label for="url">Image URL</label>
+                            <br>
+                            <input type="url" name="img_url" id="url" placeholder="https://example.com/image.png" pattern="https://.*" size="30" required>
+                            <br>
+                            <br>
+                            <label for="department">Department:</label>
+                            <select id="department" name="department" required>
+                                {% for department in departments %}
+                                    {% if department == "All" %}
+                                    {% else %}
+                                        <option value="{{ department }}">{{ department }}</option>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </select>
+                            <br>
+                            <br>
+                            <label for="exampleFormControlTextarea1">Description</label>
+                            <textarea name="description" cols="40" rows="3" class="form-control" id="exampleFormControlTextarea1" required></textarea>
+                            <br>
+                            <label for="items">Checklist items</label>
+                            <div class="alert alert-danger text-center rounded" role="alert">
+                                Enter each checklist item in a new line, or else the program may not function as expected!!
+                            </div>
+                            <textarea name="items" cols="40" class="form-control" id="exampleFormControlTextarea1" id="items" rows="8" required>
+Ex: Item 1
+Item 2
+                            </textarea>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <input type="submit" class="btn btn-success" value="Save checklist" >
+                        </div>
+                    </form>
+                </div>
+            </div>
+    </div>
+
+    <div class="row">
+        <form action="" method="POST" id="form_filter">
+            {% csrf_token %}
+            <label for="department">Filter:</label>
+            <select id="department1" name="department">
+                {% for department in departments %}
+                    {% if department == default %}
+                        <option selected value="{{ department }}">{{ department }}</option>
+                    {% else %}
+                        <option value="{{ department }}">{{ department }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <br>
+            <input type="submit" class="btn btn-primary">
+        </form>
+    </div>
+      
+    <div class="container">
+        <div class="card-deck">
+            {% for checklist in checklists %}
+            <div class="card">
+                <div class="card__img-container">
+                  <img class="card__img" src="{{ checklist.image }}" alt="Image" />
+                  {% if user.manager %}
+                    
+                    <a class="card__share" href="{% url 'delChecklist' checklist.id %}" title="Delete" aria-label="Delete checklist">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 112h352"/><path d="M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
+                    </a>
+                  {% endif %}
+
+                </div>
+                <div class="card__body | flow">
+                  <h3 class="card__title">{{ checklist.title }}</h3>
+                  <div class="card__tags">
+                    <a class="card__tag" href="#">{{ checklist.department }}</a>
+                  </div>
+                  <p class="card__date">
+                    {{ checklist.description|truncatechars_html:48 }}
+                  </p>
+                  <button type="button" class="card__cta" style="background-color: transparent; border: none;" href="#" class="btn btn-sm view_btn" data-toggle="modal" data-target="#exampleModalLong{{ checklist.id }}" onclick="fetcher({{ checklist.id }})">
+                    View details
+                </button>
+            </div>
+        </div>
+        <div class="modal fade" id="exampleModalLong{{ checklist.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+            <div class="modal-content" id="modal_{{ checklist.id }}">
+                <div class="modal-header" style="padding-bottom: 5px;" >
+                    <h5 class="modal-title" id="title_{{ checklist.id }}">Title
+                    </h5>
+                    <h5 class="badger"><span class="badge badge-secondary" style="margin-left: 3px; margin-top: 5px; background-color: #004946;" id="badge_{{ checklist.id }}">New</span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close_btn">
+                        <span aria-hidden="true"><ion-icon id="close_btn_icon" name="close-circle-outline"></ion-icon></span>
+                    </button>
+                </div>
+                <div class="modal-body" id="description_{{ checklist.id }}" style="border-bottom: 1px solid #dee2e6;">
+                </div>
+                <div class="modal-body" id="checks_{{ checklist.id }}">
+                </div>
+
+            </div>
+            </div>
+        </div>
+        {% empty %}
+            <h1>No checklists found</h1>
+    {% endfor %}
+        </div>
+    </div>
+
+
+{% endblock %}

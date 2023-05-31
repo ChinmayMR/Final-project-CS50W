@@ -1,0 +1,64 @@
+{% extends "intracom/layout.html" %}
+
+{% load static %}
+
+{% block head %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static 'intracom/edit.css' %}" rel="stylesheet">
+{% endblock head %}
+
+{% block body %}
+<h1>Managers</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        <ul>
+            {% for user in users %}
+                {% if user.id in user_manager %}
+                    <li>
+                        <label class="switch">
+                            <input type="checkbox" checked name="checkbox_{{ user.id }}">
+                            <span class="slider round"></span>
+                        </label> 
+                        {{ user.username }}
+                    </li>
+                {% else %}
+                    <li>
+                        <label class="switch">
+                            <input type="checkbox" unchecked name="checkbox_{{ user.id }}">
+                            <span class="slider round"></span>
+                        </label> 
+                        {{ user.username }}
+                    </li>
+                {% endif %}
+
+            {% endfor %}
+        </ul>
+        <input type="submit" value="Submit" class="btn btn-primary">
+    </form>
+    <br>
+    <br>
+<h1>User approval</h1>
+<form action="{% url 'approve_user' %}" method="post">
+    {% csrf_token %}
+    {% for user in users %}
+        {% if user.id in user_active %}
+            <li>
+                <label class="switch">
+                    <input type="checkbox" checked name="approve_{{ user.id }}">
+                    <span class="slider round"></span>
+                </label> 
+                {{ user.username }}
+            </li>
+        {% else %}
+            <li>
+                <label class="switch">
+                    <input type="checkbox" unchecked name="approve_{{ user.id }}">
+                    <span class="slider round"></span>
+                </label> 
+                {{ user.username }}
+            </li>
+        {% endif %}
+    {% endfor %}
+    <input type="submit" value="Approve" class="btn btn-primary">
+</form>
+{% endblock %}

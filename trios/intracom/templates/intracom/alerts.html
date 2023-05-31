@@ -1,0 +1,130 @@
+{% extends "intracom/layout.html" %}
+{% load static %}
+
+{% block title %}
+  Trios intracom: Alerts
+{% endblock title %}
+
+{% block head %}
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Rubik:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static "intracom/alerts.css" %}">
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script src="{% static "intracom/alerts.js" %}"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+{% endblock head %}
+
+{% block script %}
+  function hovered() {
+    document.querySelector('#add_butt').style.background = "#a28744";
+    document.querySelector('#add_icon').style.background = "#a28744";
+  }
+
+  function unhovered() {
+    document.querySelector('#add_butt').style.background = "#B69950";
+    document.querySelector('#add_icon').style.background = "#B69950";
+  }
+{% endblock script %}
+
+{% block body %}
+  {% if request.user.manager %}
+  <a href="" data-target="#new_post" data-toggle="modal">
+    <button onmouseover="hovered()" onmouseout="unhovered()" class="edit_button" id="add_butt"><ion-icon id="add_icon" name="add" role="img" class="md hydrated"></ion-icon></button>
+  </a>
+  {% endif %}
+
+  <div class="modal fade" tabindex="-1" role="dialog" id="new_post" aria-labelledby="new_post" aria-hidden="hidden">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalScrollableTitle">New alert</h5>
+            </div>
+            <form action="" method="post" style="overflow: scroll;">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <label for="inlineFormInputName2">Title</label>
+                    <input type="text" name="title" id="title" class="form-control mb-2 mr-sm-2" id="inlineFormInputName2" required>
+                    <br>
+                    <label for="exampleFormControlTextarea1">Description</label>
+                    <textarea name="description" cols="40" rows="3" class="form-control" id="exampleFormControlTextarea1" required></textarea>
+                    <br>
+                    <label for="url">Image URL</label>
+                    <br>
+                    <input type="url" name="img_url" id="url" placeholder="https://example.com/image.png" pattern="https://.*" size="30" required>
+                    <br>
+                    <br>
+                    <label for="department">Department:</label>
+                    <select id="department" name="department">
+                        {% for department in departments %}
+                            {% if department == "All" %}
+                            {% else %}
+                                <option value="{{ department }}">{{ department }}</option>
+                            {% endif %}
+                        {% endfor %}
+
+                    </select>
+                    <br>
+                    <br>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <input type="submit" class="btn btn-success" value="Save alert">
+                </div>
+            </form>
+        </div>
+    </div>
+  </div>
+  <!-- Cards -->
+  <div class="container">
+      <div class="card-deck">
+          {% for alert in alerts %}
+              <div class="card">
+                  <div class="card__img-container">
+                    <img class="card__img" src="{{ alert.image_url }}" alt="random unsplash image" />
+                    {% if user.manager %}
+                    <a class="card__share" href="{% url 'delAlert' alert.id %}" title="Delete" aria-label="Delete checklist">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><path d="M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 112h352"/><path d="M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
+                    </a>
+                    {% endif %}
+
+                  </div>
+                  <div class="card__body | flow">
+                    <h3 class="card__title">{{ alert.title }}</h3>
+                    <div class="card__tags">
+                      <span class="card__tag" href="#">{{ alert.department }}</span>
+                    </div>
+                    <p class="card__date">
+                      Posted on
+                      <time>{{ alert.creation_dt }}</time>
+                      by {{ alert.made_by }}
+                    </p>
+                    <button type="button" class="card__cta" style="background-color: transparent; border: none;" href="#" class="btn btn-sm view_btn" data-toggle="modal" data-target="#exampleModalLong{{ alert.id }}" onclick="fetcher({{ alert.id }})">
+                      View details
+                    </button>
+                  </div>
+              </div>
+              <div class="modal fade" id="exampleModalLong{{ alert.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="padding-bottom: 5px;" >
+                        <h5 class="modal-title" id="title_{{ alert.id }}">Title
+                        </h5>
+                        <h5 class="badger"><span class="badge badge-secondary" style="margin-left: 3px; margin-top: 5px; background-color: #004946;" id="badge_{{ alert.id }}">New</span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true"><ion-icon name="close-circle-outline"></ion-icon></span>
+                        </button>
+                    </div>
+                    <div class="modal-body" style="border-bottom: 1px solid #dee2e6;" id="description_{{ alert.id }}">
+                    </div>
+                    <div class="modal-body" id="checks_{{ alert.id }}">
+                    </div>
+                </div>
+                </div>
+              </div>
+          {% empty %}
+              <h1>No alerts found</h1>
+          {% endfor %}
+      </div>
+  </div>
+{% endblock %}
